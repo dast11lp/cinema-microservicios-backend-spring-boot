@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cinema_booking
+    username: postgres
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+server:
+  port: 8083
+
+mercadopago:
+  access-token: TEST-1137760720898209-041122-7d0bc4bb104b1818caabf97c82571035-1609123695
