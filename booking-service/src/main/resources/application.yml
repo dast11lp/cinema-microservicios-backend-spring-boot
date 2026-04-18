@@ -14,3 +14,13 @@ server:
 
 mercadopago:
   access-token: TEST-1137760720898209-041122-7d0bc4bb104b1818caabf97c82571035-1609123695
+
+auth:
+  service:
+    url: http://localhost:8081
+catalog:
+  service:
+    url: http://localhost:8082
+
+jwt:
+  secret: YAVE CEQRETA

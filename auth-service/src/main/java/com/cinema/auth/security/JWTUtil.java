@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -11,8 +12,8 @@ import java.util.Date;
 @Component
 public class JWTUtil {
 
-
-	private static final Algorithm KEY = Algorithm.HMAC256("YAVE CEQRETA");
+	@Value("${jwt.secret}")
+	private String secrectKey;
 
 	public String JwtGenerator(String email) {
 		return JWT.create().withSubject("User Details")
@@ -20,12 +21,12 @@ public class JWTUtil {
 				.withIssuedAt(new Date())
 				.withExpiresAt(new Date(System.currentTimeMillis() + 3600000 * 4 ))
 				.withIssuer("YOUR APPLICATION/PROJECT/COMPANY NAME")
-				.sign(KEY);
+				.sign(Algorithm.HMAC256(secrectKey));
 	}
 
 	public String JWtValidator(String token) {
 		
-		JWTVerifier verifier = JWT.require(KEY)
+		JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secrectKey))
 				   .withSubject("User Details")
 				   .withIssuer("YOUR APPLICATION/PROJECT/COMPANY NAME")
 				   .build();

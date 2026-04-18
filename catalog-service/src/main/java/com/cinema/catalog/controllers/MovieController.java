@@ -32,6 +32,6 @@ public class MovieController {
             .map(m -> new Movie())
             .toList();
 
-        return ResponseEntity.ok(datos);
+        return ResponseEntity.ok(movies);
     }
 }

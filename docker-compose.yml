@@ -1,0 +1,124 @@
+services:
+# servicio 1
+  db-auth-service-cinema:
+    image: postgres:15-alpine3.16
+    container_name: postgres_auth-service-cinema
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: cinema_auth
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_auth_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cinema_auth"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+#Servicio 2
+
+  db-catalog-service-cinema:
+    image: postgres:15-alpine3.16
+    container_name: postgres_catalog-service-cinema
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: cinema_catalog
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres_catalog_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL","pg_isready -U postgres -d cinema_catalog" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# Servicio 3
+
+  db-booking-service-cinema:
+    image: postgres:15-alpine3.16
+    container_name: postgres_booking-service-cinema
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: cinema_booking
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_booking_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL","pg_isready -U postgres -d cinema_booking" ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+
+
+#----------- spring boot microservices ---------------------
+
+# Servicio 4
+  app-auth-service:
+    build: ./auth-service
+    container_name: auth_service_spring
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-auth-service-cinema:5432/cinema_auth
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=1234
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - JWT_SECRET=YAVE CEQRETA
+    depends_on:
+      db-auth-service-cinema:
+        condition: service_healthy
+
+#servicio 5
+
+  app-booking-service:
+    build: ./booking-service
+    container_name: booking_service_spring
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-booking-service-cinema:5432/cinema_booking
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=1234
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - AUTH_SERVICE_URL=http://app-auth-service:8081
+      - CATALOG_SERVICE_URL=http://app-catalog-service:8082
+      - JWT_SECRET=YAVE CEQRETA
+
+    depends_on:
+      db-booking-service-cinema:
+        condition: service_healthy
+      app-auth-service:
+        condition: service_started
+      app-catalog-service:
+        condition: service_started
+# Servicio 6
+
+  app-catalog-service:
+    build: ./catalog-service
+    container_name: catalog_service_spring
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-catalog-service-cinema:5432/cinema_catalog
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=1234
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - JWT_SECRET=YAVE CEQRETA
+    depends_on:
+      db-catalog-service-cinema:
+        condition: service_healthy
+
+#---- declaración de volúmenes ------
+
+volumes:
+  postgres_auth_data:
+  postgres_booking_data:
+  postgres_catalog_data:
+
+
