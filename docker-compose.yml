@@ -62,8 +62,8 @@ services:
   app-auth-service:
     build: ./auth-service
     container_name: auth_service_spring
-    ports:
-      - "8081:8081"
+#    ports:
+#      - "8081:8081"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-auth-service-cinema:5432/cinema_auth
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -79,8 +79,8 @@ services:
   app-booking-service:
     build: ./booking-service
     container_name: booking_service_spring
-    ports:
-      - "8083:8083"
+#    ports:
+#      - "8083:8083"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-booking-service-cinema:5432/cinema_booking
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -102,8 +102,8 @@ services:
   app-catalog-service:
     build: ./catalog-service
     container_name: catalog_service_spring
-    ports:
-      - "8082:8082"
+#    ports:
+#      - "8082:8082"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-catalog-service-cinema:5432/cinema_catalog
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -114,11 +114,26 @@ services:
       db-catalog-service-cinema:
         condition: service_healthy
 
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_gateway
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - app-auth-service
+      - app-catalog-service
+      - app-booking-service
+
+
 #---- declaración de volúmenes ------
 
 volumes:
   postgres_auth_data:
   postgres_booking_data:
   postgres_catalog_data:
+
+
 
 
