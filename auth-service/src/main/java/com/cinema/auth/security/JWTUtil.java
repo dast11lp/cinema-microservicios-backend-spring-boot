@@ -15,12 +15,15 @@ public class JWTUtil {
 	@Value("${jwt.secret}")
 	private String secrectKey;
 
+	@Value("${jwt.expiration}")
+	private Long expiration;
+
 	public String JwtGenerator(String email) {
 		return JWT.create().withSubject("User Details")
 				.withClaim("email", email)
 				.withIssuedAt(new Date())
-				.withExpiresAt(new Date(System.currentTimeMillis() + 3600000 * 4 ))
-				.withIssuer("YOUR APPLICATION/PROJECT/COMPANY NAME")
+				.withExpiresAt(new Date(System.currentTimeMillis() + expiration ))
+				.withIssuer("cinePop")
 				.sign(Algorithm.HMAC256(secrectKey));
 	}
 
@@ -28,13 +31,10 @@ public class JWTUtil {
 		
 		JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secrectKey))
 				   .withSubject("User Details")
-				   .withIssuer("YOUR APPLICATION/PROJECT/COMPANY NAME")
+				   .withIssuer("cinePop")
 				   .build();
 		
 		DecodedJWT jwt = verifier.verify(token);
-		
-		
-		
 		return jwt.getClaim("email").asString();
 	}
 }

@@ -15,3 +15,4 @@ server:
 
 jwt:
   secret: YAVE CEQRETA
+  expiration: 14400000
