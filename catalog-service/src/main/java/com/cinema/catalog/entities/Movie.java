@@ -42,7 +42,7 @@ public class Movie {
 	private String language;
 	
 	@JsonIgnoreProperties({"movie","hibernateLazyInitializer","handler"})
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "movie")
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "movie")
 	private List<FunctionMovie> functionMovie;
 	
 	

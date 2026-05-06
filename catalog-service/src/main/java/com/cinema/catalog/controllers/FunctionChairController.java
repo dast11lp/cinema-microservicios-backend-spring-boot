@@ -38,8 +38,20 @@ public class FunctionChairController {
 		return ResponseEntity.ok(this.chairService.findByFunction(function));
 	}
 
-	@PutMapping("/occupy")
+	@PutMapping("/block")
 	public ResponseEntity<?> reserve (@RequestBody List<Long> chairIds) {
-		return ResponseEntity.ok(this.chairService.reserveChairs(chairIds));
+		/*return ResponseEntity.ok(this.chairService.reserveChairs(chairIds));*/
+		return ResponseEntity.ok(this.chairService.blockChairs(chairIds));
 	}
+
+	@PutMapping("/occupy")
+	public ResponseEntity<?> occupy (@RequestBody List<Long> ChairsIds) {
+		return ResponseEntity.ok(this.chairService.occupyChairs(ChairsIds));
+	}
+
+	@PutMapping("/release")
+	public ResponseEntity<?> release(@RequestBody List<Long> chairIds) {
+		return ResponseEntity.ok(this.chairService.releaseChairs(chairIds));
+	}
+
 }

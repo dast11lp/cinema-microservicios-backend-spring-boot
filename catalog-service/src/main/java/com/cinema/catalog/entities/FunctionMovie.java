@@ -14,13 +14,13 @@ public class FunctionMovie {
 	
 	
 	@JsonIgnoreProperties({"listFunctionMovie", "hibernateLazyInitializer", "handler"})
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name= "id_fun")
 	private Function function;
 	
 	
 	@JsonIgnoreProperties({"functionMovie","hibernateLazyInitializer", "handler"})
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name= "id_mov")
 	private Movie movie;
 	

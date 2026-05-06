@@ -21,7 +21,7 @@ public class MovieController {
         this.movieService = movieService;
     }
 
-    @GetMapping
+    @GetMapping("list")
     public ResponseEntity<List<Movie>> findAll() {
         List<Movie> movies = movieService.findAll();
         

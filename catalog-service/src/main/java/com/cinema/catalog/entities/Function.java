@@ -27,13 +27,13 @@ public class Function {
 	@Column(name="price_ticket_fun") 
 	private Double priceTicket;
 
-	@JsonIgnore
+	/*@JsonIgnore*/
 	@JsonIgnoreProperties({"function", "hibernateLazyInitializer","handle"})
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "function")
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "function")
 	private List<FunctionMovie> listFunctionMovie;
 
-	@JsonIgnore
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "function")
+	/*@JsonIgnore*/
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "function")
 	@OrderBy("number_cha ASC")
 	private List<FunctionChair >functionChairs ;
 

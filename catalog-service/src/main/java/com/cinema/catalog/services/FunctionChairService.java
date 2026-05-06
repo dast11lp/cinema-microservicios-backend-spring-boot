@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class FunctionChairService {
 		return this.chairRepository.findByFunction(function);
 	}
 
-	public List<Long> reserveChairs(List<Long> chairsId) {
+	public List<FunctionChair> blockChairs(List<Long> chairsId) {
 		List<FunctionChair> chairs = this.chairRepository.findAllById(chairsId);
 
 		//validar sillas disponibles
@@ -50,9 +51,30 @@ public class FunctionChairService {
 			}
 		}
 
-		chairs.forEach(chair -> chair.setAvailable(false));
-		this.chairRepository.saveAll(chairs);
-		return chairs.stream().map(FunctionChair::getId).toList();
+		chairs.forEach(chair -> {
+			chair.setStatus("BLOCKED");
+			chair.setBlockedUntil(LocalDateTime.now().plusMinutes(10));
+		});
+		return this.chairRepository.saveAll(chairs);
+		/*return chairs.stream().map(FunctionChair::getId).toList();*/
 		// FunctionChair::getId equivale a chair -> chair.getId()
+	}
+
+	public List<FunctionChair> occupyChairs(List<Long> chairsId) {
+		List <FunctionChair> chairs = this.chairRepository.findAllById(chairsId);
+		chairs.forEach(chair -> {
+			chair.setStatus("OCCUPIED");
+			chair.setAvailable(false);
+		});
+		return this.chairRepository.saveAll(chairs);
+	}
+
+	public List<FunctionChair> releaseChairs(List<Long> chairsId) {
+		List<FunctionChair> chairs = this.chairRepository.findAllById(chairsId);
+		chairs.forEach(chair -> {
+			chair.setStatus("AVAILABLE");
+			chair.setBlockedUntil(null);
+		});
+		return this.chairRepository.saveAll(chairs);
 	}
 }

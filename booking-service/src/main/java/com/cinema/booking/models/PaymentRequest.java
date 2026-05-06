@@ -1,6 +1,7 @@
 package com.cinema.booking.models;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class PaymentRequest {
 
@@ -12,6 +13,8 @@ public class PaymentRequest {
     private String paymentMethodId;
     private String method ;
     private Long reservationId;
+    private Long IdUser;
+    private List<Long> listChairs;
 
     public BigDecimal getPrice() {
         return price;
@@ -75,5 +78,21 @@ public class PaymentRequest {
 
     public void setReservationId(Long reservationId) {
         this.reservationId = reservationId;
+    }
+
+    public Long getIdUser() {
+        return IdUser;
+    }
+
+    public void setIdUser(Long idUser) {
+        IdUser = idUser;
+    }
+
+    public List<Long> getListChairs() {
+        return listChairs;
+    }
+
+    public void setListChairs(List<Long> listChairs) {
+        this.listChairs = listChairs;
     }
 }

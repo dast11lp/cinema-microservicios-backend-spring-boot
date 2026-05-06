@@ -1,11 +1,9 @@
 package com.cinema.booking.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity(name = "function_reservation")
 public class FunctionReservation {
@@ -19,7 +17,7 @@ public class FunctionReservation {
 	private LocalDateTime dateRes;
 	
 	@Column (name ="total_mou_res")
-	private Double totalMount;
+	private BigDecimal totalMount;
 
 	@Column(name = "payment_status")
 	private String paymentStatus;
@@ -57,11 +55,11 @@ public class FunctionReservation {
 		this.dateRes = dateRes;
 	}
 
-	public Double getTotalMount() {
+	public BigDecimal getTotalMount() {
 		return totalMount;
 	}
 
-	public void setTotalMount(Double totalMount) {
+	public void setTotalMount(BigDecimal totalMount) {
 		this.totalMount = totalMount;
 	}
 

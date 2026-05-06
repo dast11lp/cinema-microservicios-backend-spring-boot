@@ -3,6 +3,8 @@ package com.cinema.catalog.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity(name="function_chair")
 public class FunctionChair {
 	
@@ -22,6 +24,16 @@ public class FunctionChair {
 	@JoinColumn(name="id_fun_mov")
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Function function;
+
+	//-----------------
+
+	@Column
+	private String status; //AVAILABLE, BLOCKED, OCCUPIED
+
+	@Column(name = "blocked_until")
+	private LocalDateTime blockedUntil;
+
+	//-----------------
 
 	public Long getId() {
 		return id;
@@ -56,4 +68,19 @@ public class FunctionChair {
 		this.function = function;
 	}
 
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public LocalDateTime getBlockedUntil() {
+		return blockedUntil;
+	}
+
+	public void setBlockedUntil(LocalDateTime blockedUntil) {
+		this.blockedUntil = blockedUntil;
+	}
 }

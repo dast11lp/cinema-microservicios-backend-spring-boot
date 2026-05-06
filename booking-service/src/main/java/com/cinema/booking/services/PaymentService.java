@@ -1,7 +1,9 @@
 package com.cinema.booking.services;
 
 import com.cinema.booking.entities.FunctionReservation;
+import com.cinema.booking.models.ChairDTO;
 import com.cinema.booking.models.PaymentRequest;
+import com.cinema.booking.models.ReservationResponse;
 import com.cinema.booking.repositories.FunctionReservationRepository;
 import com.mercadopago.MercadoPagoConfig;
 import com.mercadopago.client.common.IdentificationRequest;
@@ -12,26 +14,36 @@ import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.payment.Payment;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.util.Optional;
+import java.util.List;
 
 @Service
 public class PaymentService {
 
-    private FunctionReservationRepository functionReservationRepository;
+    private final FunctionReservationRepository functionReservationRepository;
 
     @Value("${mercadopago.access-token}")
-    private String accessToken; // el accestoken hacia la api
+    private String accessToken; // el access token hacia la api
 
-    public PaymentService (FunctionReservationRepository functionReservationRepository) {
+    private final WebClient catalogClient;
+
+    public PaymentService (
+            FunctionReservationRepository functionReservationRepository,
+            WebClient catalogClient
+    ) {
         this.functionReservationRepository = functionReservationRepository;
+        this.catalogClient = catalogClient;
     }
 
-    public Payment processPayment (PaymentRequest paymentRequest) throws MPApiException {
+    /*public Payment processPayment (PaymentRequest paymentRequest) throws MPApiException {*/
+    public ReservationResponse processPayment (PaymentRequest paymentRequest) throws MPApiException {
         MercadoPagoConfig.setAccessToken(accessToken);
 
-        //Crear Requiest para mercadoPago
+        //1. Crear Requiest para mercadoPago
 
         PaymentCreateRequest mpPaymentCreateRequest = PaymentCreateRequest.builder()
                 .transactionAmount(paymentRequest.getPrice())
@@ -50,28 +62,71 @@ public class PaymentService {
                 )
                 .build();
 
-        //enviar request a mercado pago
-
+        //2. enviar request a mercado pago
+        Payment payment;
         try {
             PaymentClient client = new PaymentClient();
-            Payment payment = client.create(mpPaymentCreateRequest);
+            payment = client.create(mpPaymentCreateRequest);
 
-            Optional<FunctionReservation> functionReservationOpt = this.functionReservationRepository.findById(paymentRequest.getReservationId());
-
-            if(functionReservationOpt.isPresent()) {
-                FunctionReservation reservation = functionReservationOpt.get();
-                reservation.setPaymentStatus(payment.getStatus());
-                reservation.setPaymentId(payment.getId());
-                this.functionReservationRepository.save(reservation);
-            }
-
-            return payment;
         } catch (MPApiException e) {
             System.out.println("MPApiException: " + e.getApiResponse().getContent());
+            // liberar sillas bloqueadas
+            this.catalogClient.put()
+                    .uri("/functionChair/release")
+                    .bodyValue(paymentRequest.getListChairs())
+                    .retrieve()
+                    .bodyToMono(Void.class)
+                    .block();
             throw e;
         } catch (MPException e) {
             System.out.println("MPException: " + e.getMessage());
             throw new RuntimeException(e);
         }
+
+        // 3. validar pago
+
+        if (!payment.getStatus().equals("approved")) {
+            throw new RuntimeException("Pago no aprobado. Estado: " + payment.getStatus());
+        }
+
+        List<ChairDTO> reservedChairs;
+
+        // 4. validar sillas.
+
+        try {
+            reservedChairs = this.catalogClient.put()
+                    .uri("/functionChair/occupy")
+                    .bodyValue(paymentRequest.getListChairs())
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<List<ChairDTO>>() {})
+                    .block();
+        } catch (WebClientResponseException e) {
+            throw new RuntimeException("Error al reservar sillas: " + e.getResponseBodyAsString());
+        }
+
+        if (reservedChairs == null || reservedChairs.isEmpty()) {
+            throw new RuntimeException("No se pudieron reservar las sillas");
+        }
+
+        // 5. validar y reservar función
+
+        FunctionReservation reservation = this.functionReservationRepository
+                .findById(paymentRequest.getReservationId())
+                .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
+
+        // respuesta
+
+        ReservationResponse response = new ReservationResponse();
+        response.setReservationId(reservation.getFunctionMovieId());
+        response.setUserId(reservation.getUserId());
+        response.setFunctionMovieId(reservation.getFunctionMovieId());
+        response.setTotalMount(reservation.getTotalMount());
+        response.setChairs(reservedChairs);
+
+        reservation.setPaymentStatus(payment.getStatus());
+        reservation.setPaymentId(payment.getId());
+        this.functionReservationRepository.save(reservation);
+
+        return response;
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface FunctionChairRepository extends JpaRepository<FunctionChair, Long>{
@@ -16,5 +17,7 @@ public interface FunctionChairRepository extends JpaRepository<FunctionChair, Lo
 	FunctionChair findByNumberChair(@Param("numberChair") Long numberChair);
 
 	List<FunctionChair> findByFunction (Function function);
-	
+
+	@Query("SELECT fc FROM function_chair fc WHERE fc.status = 'BLOCKED' AND fc.blockedUntil < :now")
+	List<FunctionChair> findExpiredBlockedChairs(@Param("now")LocalDateTime now);
 }
