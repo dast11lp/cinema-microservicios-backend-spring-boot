@@ -5,18 +5,6 @@ Cada servicio es independiente, tiene su propia base de datos y se comunica a tr
 
 ## Arquitectura
 
-![Arquitectura](./cinepop_microservices_architecture.svg)
-
-
-
-El sistema está compuesto por 3 microservicios:
-
-- **auth-service** — Registro, login y generación de JWT
-- **catalog-service** — Gestión de películas y funciones con paginación
-- **booking-service** — Reservas de sillas y procesamiento de pagos con MercadoPago
-
-El tráfico entre el frontend y los servicios pasa por **Nginx** como API Gateway.
-
 ## Stack tecnológico
 
 - **Java 21** + **Spring Boot 3**
@@ -26,10 +14,20 @@ El tráfico entre el frontend y los servicios pasa por **Nginx** como API Gatewa
 - **Docker** + **Docker Compose** para orquestación
 - **Nginx** como API Gateway
 
+![Arquitectura](./cinepop_microservices_architecture.svg)
+
+El sistema está compuesto por 3 microservicios:
+
+- **auth-service** — Registro, login y generación de JWT
+- **catalog-service** — Gestión de películas y funciones con paginación
+- **booking-service** — Reservas de sillas y procesamiento de pagos con MercadoPago
+
+El tráfico entre el frontend y los servicios pasa por **Nginx** como API Gateway.
+
+
 ## Flujo de microservicios
 
 ![Flujo](./booking_flow.svg)
-
 
 
 ## Cómo correrlo localmente
