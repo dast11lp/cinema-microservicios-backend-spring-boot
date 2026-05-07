@@ -27,7 +27,16 @@ El sistema está compuesto por 3 microservicios:
 El tráfico entre el frontend y los servicios pasa por **Nginx** como API Gateway.
 
 
-## Flujo de microservicios
+## Flujo de compra de boletos
+
+### Flujo general
+
+1. El usuario se autentica mediante `auth-service` y obtiene un JWT.
+2. El frontend consulta películas y funciones desde `catalog-service`.
+3. Cuando el usuario selecciona sillas, `booking-service` las bloquea temporalmente.
+4. Se crea una reserva asociada a la función seleccionada.
+5. El frontend procesa el pago usando MercadoPago.
+6. Tras la aprobación del pago, `booking-service` confirma definitivamente la reserva y ocupa las sillas.
 
 ![Flujo](./booking_flow.svg)
 
