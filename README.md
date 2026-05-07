@@ -3,7 +3,7 @@
 Backend de una plataforma de reservas de cine construido con arquitectura de microservicios.
 Cada servicio es independiente, tiene su propia base de datos y se comunica a través de un API Gateway en Nginx.
 
-## Arquitectura
+
 
 ## Stack tecnológico
 
@@ -13,6 +13,8 @@ Cada servicio es independiente, tiene su propia base de datos y se comunica a tr
 - **MercadoPago SDK** para procesamiento de pagos
 - **Docker** + **Docker Compose** para orquestación
 - **Nginx** como API Gateway
+
+## Arquitectura
 
 ![Arquitectura](./cinepop_microservices_architecture.svg)
 
