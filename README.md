@@ -5,7 +5,7 @@ Cada servicio es independiente, tiene su propia base de datos y se comunica a tr
 
 ## Arquitectura
 
-![Arquitectura](./arquitectura_microservicios_completa.svg)
+![Arquitectura](./cinepop_microservices_architecture.svg)
 
 El sistema está compuesto por 3 microservicios:
 
@@ -17,7 +17,7 @@ El tráfico entre el frontend y los servicios pasa por **Nginx** como API Gatewa
 
 ## Flujo de microservicios
 
-![Flujo](./microservices_flow.svg)
+![Flujo](./booking_flow.svg)
 
 ## Stack tecnológico
 
