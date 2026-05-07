@@ -3,8 +3,6 @@
 Backend de una plataforma de reservas de cine construido con arquitectura de microservicios.
 Cada servicio es independiente, tiene su propia base de datos y se comunica a través de un API Gateway en Nginx.
 
-
-
 ## Stack tecnológico
 
 - **Java 21** + **Spring Boot 3**
@@ -26,10 +24,11 @@ El sistema está compuesto por 3 microservicios:
 
 El tráfico entre el frontend y los servicios pasa por **Nginx** como API Gateway.
 
-
 ## Flujo de compra de boletos
 
 ### Flujo general
+
+![Flujo](./booking_flow.svg)
 
 1. El usuario se autentica mediante `auth-service` y obtiene un JWT.
 2. El frontend consulta películas y funciones desde `catalog-service`.
@@ -38,7 +37,7 @@ El tráfico entre el frontend y los servicios pasa por **Nginx** como API Gatewa
 5. El frontend procesa el pago usando MercadoPago.
 6. Tras la aprobación del pago, `booking-service` confirma definitivamente la reserva y ocupa las sillas.
 
-![Flujo](./booking_flow.svg)
+
 
 
 ## Cómo correrlo localmente
