@@ -1,13 +1,18 @@
 package com.cinema.booking.controllers;
 
+import com.cinema.booking.entities.FunctionReservation;
 import com.cinema.booking.models.*;
 import com.cinema.booking.services.FunctionReservationService;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -25,6 +30,7 @@ public class FuntionReservationController {
 	@Autowired
 	private WebClient catalogClient;
 
+
     @PostMapping("reserve-function-movie")
     public ResponseEntity<?> reserveFunction(@RequestBody Reservation reservationReq, @PathVariable Long idUser) {
         try {
@@ -33,6 +39,18 @@ public class FuntionReservationController {
         } catch (WebClientResponseException e) {
             return ResponseEntity.badRequest().body(e.getResponseBodyAsString());
         }
+    }
+
+    @GetMapping("getReservesPages")
+    public ResponseEntity<Page<FunctionReservation>> getReservationsByPage(
+            @PathVariable Long idUser,
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        Page<FunctionReservation> reservations = funcResSer.findByUserId(idUser, PageRequest.of(page, 1));
+        if (reservations.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(reservations);
     }
 
 }

@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -22,16 +24,14 @@ public class MovieController {
     }
 
     @GetMapping("list")
-    public ResponseEntity<List<Movie>> findAll() {
-        List<Movie> movies = movieService.findAll();
-        
+    public ResponseEntity<Page<Movie>> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size
+    ) {
+        Page<Movie> movies = movieService.findAll(page, size);
         if (movies.isEmpty()) {
-            return ResponseEntity.noContent().build(); 
+            return ResponseEntity.noContent().build();
         }
-        List<Movie> datos = movies.stream()
-            .map(m -> new Movie())
-            .toList();
-
         return ResponseEntity.ok(movies);
     }
 }
