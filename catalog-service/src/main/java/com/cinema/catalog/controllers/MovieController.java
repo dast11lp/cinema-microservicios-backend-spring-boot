@@ -3,14 +3,9 @@ package com.cinema.catalog.controllers;
 import com.cinema.catalog.entities.Movie;
 import com.cinema.catalog.services.MovieService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/movies")
@@ -33,5 +28,12 @@ public class MovieController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(movies);
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<Movie> findById(@PathVariable Long id) {
+        Movie movie = movieService.findById(id);
+        if (movie == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(movie);
     }
 }

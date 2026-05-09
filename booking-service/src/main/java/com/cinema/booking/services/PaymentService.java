@@ -1,10 +1,12 @@
 package com.cinema.booking.services;
 
 import com.cinema.booking.entities.FunctionReservation;
+import com.cinema.booking.entities.ReservationChair;
 import com.cinema.booking.models.ChairDTO;
 import com.cinema.booking.models.PaymentRequest;
 import com.cinema.booking.models.ReservationResponse;
 import com.cinema.booking.repositories.FunctionReservationRepository;
+import com.cinema.booking.repositories.ReservationChairRepository;
 import com.mercadopago.MercadoPagoConfig;
 import com.mercadopago.client.common.IdentificationRequest;
 import com.mercadopago.client.payment.PaymentClient;
@@ -31,15 +33,18 @@ public class PaymentService {
 
     private final WebClient catalogClient;
 
+    private final ReservationChairRepository reservationChairRepository;
+
     public PaymentService (
             FunctionReservationRepository functionReservationRepository,
-            WebClient catalogClient
+            WebClient catalogClient,
+            ReservationChairRepository reservationChairRepository
     ) {
         this.functionReservationRepository = functionReservationRepository;
         this.catalogClient = catalogClient;
+        this.reservationChairRepository = reservationChairRepository;
     }
 
-    /*public Payment processPayment (PaymentRequest paymentRequest) throws MPApiException {*/
     public ReservationResponse processPayment (PaymentRequest paymentRequest) throws MPApiException {
         MercadoPagoConfig.setAccessToken(accessToken);
 
@@ -117,7 +122,7 @@ public class PaymentService {
         // 6. respuesta
 
         ReservationResponse response = new ReservationResponse();
-        response.setReservationId(reservation.getFunctionMovieId());
+        response.setReservationId(reservation.getId());
         response.setUserId(reservation.getUserId());
         response.setFunctionMovieId(reservation.getFunctionMovieId());
         response.setTotalMount(reservation.getTotalMount());
@@ -126,6 +131,15 @@ public class PaymentService {
         reservation.setPaymentStatus(payment.getStatus());
         reservation.setPaymentId(payment.getId());
         this.functionReservationRepository.save(reservation);
+
+        // 7. guardar sillas de la reserva
+        for (ChairDTO chair : reservedChairs) {
+            ReservationChair rc = new ReservationChair();
+            rc.setReservationId(reservation.getId());
+            rc.setChairId(chair.getId());
+            rc.setNumberChair(chair.getNumberChair());
+            reservationChairRepository.save(rc);
+        }
 
         return response;
     }

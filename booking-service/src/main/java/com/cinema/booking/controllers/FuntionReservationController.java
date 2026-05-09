@@ -42,11 +42,11 @@ public class FuntionReservationController {
     }
 
     @GetMapping("getReservesPages")
-    public ResponseEntity<Page<FunctionReservation>> getReservationsByPage(
+    public ResponseEntity<Page<ReservationResponse>> getReservationsByPage(
             @PathVariable Long idUser,
             @RequestParam(defaultValue = "0") int page
     ) {
-        Page<FunctionReservation> reservations = funcResSer.findByUserId(idUser, PageRequest.of(page, 1));
+        Page<ReservationResponse> reservations = funcResSer.findByUserIdEnriched(idUser, PageRequest.of(page, 1));
         if (reservations.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

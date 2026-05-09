@@ -14,6 +14,8 @@ public class ReservationResponse {
     private String username;
     private String room;
     private String dateFun;
+    private String movieName;
+
 
     public Long getReservationId() {
         return reservationId;
@@ -60,7 +62,7 @@ public class ReservationResponse {
     }
 
     public void setDateRes(LocalDateTime dateRes) {
-        dateRes = dateRes;
+        this.dateRes = dateRes;
     }
 
     public String getUsername() {
@@ -85,5 +87,13 @@ public class ReservationResponse {
 
     public void setDateFun(String dateFun) {
         this.dateFun = dateFun;
+    }
+
+    public String getMovieName() {
+        return movieName;
+    }
+
+    public void setMovieName(String movieName) {
+        this.movieName = movieName;
     }
 }

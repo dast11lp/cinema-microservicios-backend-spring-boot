@@ -1,11 +1,14 @@
 package com.cinema.booking.models;
 
+import java.util.List;
+
 public class FunctionDTO {
     private Long id;
     private String hourTime;
     private String date;
     private String room;
     private Double priceTicket;
+    private List<FunctionMovieDTO> listFunctionMovie;
 
     public Long getId() {
         return id;
@@ -46,4 +49,7 @@ public class FunctionDTO {
     public void setPriceTicket(Double price) {
         this.priceTicket = price;
     }
+
+    public List<FunctionMovieDTO> getListFunctionMovie() { return listFunctionMovie; }
+    public void setListFunctionMovie(List<FunctionMovieDTO> list) { this.listFunctionMovie = list; }
 }

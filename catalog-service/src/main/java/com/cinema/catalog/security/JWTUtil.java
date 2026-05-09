@@ -17,7 +17,7 @@ public class JWTUtil {
 
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret))
                 .withSubject("User Details")
-                .withIssuer("YOUR APPLICATION/PROJECT/COMPANY NAME")
+                .withIssuer("cinePop")
                 .build();
 
         DecodedJWT jwt = verifier.verify(token);

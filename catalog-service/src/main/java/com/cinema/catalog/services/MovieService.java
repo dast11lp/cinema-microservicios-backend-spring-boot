@@ -26,4 +26,8 @@ public class MovieService {
 		
 		return movie;
 	}
+
+	public Movie findById(Long id) {
+		return movieRep.findById(id).orElse(null);
+	}
 }

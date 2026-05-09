@@ -3,6 +3,7 @@ package com.cinema.booking.services;
 import com.cinema.booking.entities.FunctionReservation;
 import com.cinema.booking.models.*;
 import com.cinema.booking.repositories.FunctionReservationRepository;
+import com.cinema.booking.repositories.ReservationChairRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,9 @@ public class FunctionReservationService {
 
     @Autowired
     private WebClient catalogClient;
+
+	@Autowired
+	private ReservationChairRepository reservationChairRepository;
 
 	public FunctionReservation findById(Long id) {
 		return this.funResRepo.findById(id).orElse(null);
@@ -97,6 +101,60 @@ public class FunctionReservationService {
 		response.setRoom(function.getRoom());
 		response.setDateFun(function.getDate());
 
+		if (function.getListFunctionMovie() != null && !function.getListFunctionMovie().isEmpty()) {
+			response.setMovieName(function.getListFunctionMovie().get(0).getMovie().getMovieName());
+		}
+
 		return response;
+	}
+
+	public Page<ReservationResponse> findByUserIdEnriched(Long userId, Pageable pageable) {
+		Page<FunctionReservation> reservations = funResRepo.findByUserId(userId, pageable);
+
+		return reservations.map(reservation -> {
+
+			UserDTO user = authClient.get()
+					.uri("/users/" + userId)
+					.retrieve()
+					.bodyToMono(UserDTO.class)
+					.block();
+
+			FunctionDTO function = catalogClient.get()
+					.uri("/functions/" + reservation.getFunctionMovieId())
+					.retrieve()
+					.bodyToMono(FunctionDTO.class)
+					.block();
+
+			List<ChairDTO> chairs = reservationChairRepository
+					.findByReservationId(reservation.getId())
+					.stream()
+					.map(rc -> {
+						ChairDTO chair = new ChairDTO();
+						chair.setId(rc.getChairId());
+						chair.setNumberChair(rc.getNumberChair());
+						return chair;
+					})
+					.toList();
+
+			ReservationResponse response = new ReservationResponse();
+			response.setReservationId(reservation.getId());
+			response.setUserId(userId);
+			response.setFunctionMovieId(reservation.getFunctionMovieId());
+			response.setTotalMount(reservation.getTotalMount());
+			response.setDateRes(reservation.getDateRes());
+			response.setChairs(chairs);
+
+			if (user != null) response.setUsername(user.getUsername());
+
+			if (function != null) {
+				response.setRoom(function.getRoom());
+				response.setDateFun(function.getDate());
+				if (function.getListFunctionMovie() != null && !function.getListFunctionMovie().isEmpty()) {
+					response.setMovieName(function.getListFunctionMovie().get(0).getMovie().getMovieName());
+				}
+			}
+
+			return response;
+		});
 	}
 }
